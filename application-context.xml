@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util" 
+       xmlns:mvc="http://www.springframework.org/schema/mvc" 
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+     http://www.springframework.org/schema/util   http://www.springframework.org/schema/util/spring-util-3.2.xsd
+                      
+ http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd  
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <mvc:annotation-driven/>
+    <context:component-scan base-package="com.GTCSoftware.wordGuess, com.GTCSoftware.wordGuess.webservices.rest" />
+
+                      
+    <bean name="handlerAdapter"
+          class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+                <ref bean="jsonConverter"/>
+
+            </list>
+
+        </property>
+        <property name="requireSession" value="false"/>
+
+    </bean>
+    <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes" value="application/json"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+    <bean id="xmlViewer" 
+          class="org.springframework.web.servlet.view.xml.MarshallingView">
+        <constructor-arg>
+            <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+                <property name="classesToBeBound">
+                    <list>
+                        <value>com.GTCSoftware.wordGuess.persistentObject.Game</value>
+                        <value>com.GTCSoftware.wordGuess.persistentObject.GameState</value>
+                        <value>com.GTCSoftware.wordGuess.persistentObject.WordGameWrapper</value>
+                    </list>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+       
+    <bean id="dao" class="com.GTCSoftware.wordGuess.DAO.DAOImpl" abstract= "true"> 
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="gameDAO" class="com.GTCSoftware.wordGuess.DAO.GameDAOImpl"
+          parent="dao"> 
+    </bean> 
+
+    <bean id="playerDAO" class="com.GTCSoftware.wordGuess.DAO.PlayerDAOImpl"
+          parent="dao"> 
+
+    </bean>
+    <bean id="gameStateDAO" class="com.GTCSoftware.wordGuess.DAO.GameStateDAOImpl"
+          parent="dao"> 
+    </bean>
+      
+
+    <bean id="playerService" class="com.GTCSoftware.wordGuess.service.PlayerServiceImpl" >
+        <property name="playerDAO" ref="playerDAO" />
+    </bean>
+
+
+    <bean id="gameService" class="com.GTCSoftware.wordGuess.service.GameServiceImpl"> 
+        <property name="gameDAO" ref="gameDAO" />
+    </bean>
+   
+    <bean id="gameStateService" class="com.GTCSoftware.wordGuess.service.GameStateServiceImpl"> 
+        <property name="gameStateDAO" ref="gameStateDAO" />
+     
+    </bean>
+
+    <bean id="wordGameController" class="com.GTCSoftware.wordGuess.webservices.rest.WordGameController"> 
+        <property name="gameService" ref="gameService" />
+     
+    </bean>
+    
+ 
+    <!-- enable the configuration of transactional behavior based on annotations -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <context:annotation-config />
+    <!-- the transactional advice (what 'happens'; see the <aop:advisor/> bean below) -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!-- the transactional semantics... -->
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="add*" read-only="false"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+  
+    <!-- ensure that the above transactional advice runs for any execution
+    of an operation defined by the FooService interface -->
+   
+                       
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <!-- <property name="driverClassName" value="org.h2.Driver" /> -->
+        <property name="url" value="jdbc:mysql://localhost:3306/word_guess_schema" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+           
+            </props>
+      
+        </property>
+        <property name="annotatedClasses">
+            <list>
+                <value>com.GTCSoftware.wordGuess.persistentObject.Game</value>
+                <value>com.GTCSoftware.wordGuess.persistentObject.GameState</value>
+                <value>com.GTCSoftware.wordGuess.persistentObject.Player</value>
+            </list>
+        </property>
+    </bean>
+
+    <context:component-scan base-package="com.GTCSoftware.wordGuess, com.GTCSoftware.wordGuess.service, com.GTCSoftware.wordGuess.webservices.rest"/>
+
+
+
+
+
+    <!-- similarly, don't forget the PlatformTransactionManager -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager" p:sessionFactory-ref="sessionFactory">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+</beans>
+
+
+
+
+
+

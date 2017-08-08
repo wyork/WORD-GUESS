@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+                                                                
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://webservices.wordguess.GTCSoftware.com"  targetNamespace="http://webservices.wordguess.GTCSoftware.com"  elementFormDefault="qualified">
+ 
+    <xs:element name="Game">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+                <xs:element name="dateStarted" type="xs:date"/>
+                <xs:element name="dateOfLastMove" type="xs:date"/>
+                <xs:element name="winningPlayer" type="xs:string"/>
+                <xs:element name="playerTurn" type="xs:string"/>
+                <xs:element name="roundNumber" type="xs:int"/>
+                <xs:element name="opponent">
+                    <xs:complexType>
+                        <xs:sequence  maxOccurs="1" minOccurs="0">
+                            <xs:element name="id" type="xs:string"/>
+                            <xs:element name="playerId" type="xs:string"/>
+                            <xs:element name="reserved" type="xs:boolean"/>
+                            <xs:element name="secretWord" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="BoardState">
+                    <xs:complexType >
+                        <xs:sequence  maxOccurs="1" minOccurs="0">
+                            <xs:element name="letterPadState" type="xs:string"/>
+                            <xs:element name="guessHistory" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

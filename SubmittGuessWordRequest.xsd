@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+                                                                
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://GTCSoftware.com/wordGuess/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="SubmittGuessWordRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Game">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="Id"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Player">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="Id"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="GameState">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="LetterPadState"/>
+                            <xs:element type="xs:string" name="GuessHistory"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

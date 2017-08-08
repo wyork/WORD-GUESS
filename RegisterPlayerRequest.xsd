@@ -1,0 +1,16 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://GTCSoftware.com/wordGuess/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="RegisterPlayerRequest">
+          <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Player">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="Id"/>
+                            <xs:element type="xs:string" name="Token"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
